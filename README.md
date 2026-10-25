@@ -18,7 +18,9 @@ Built as a lightweight, single-page web application with no build steps, bundler
 
 ## Getting Started
 
-Browsers require a **secure context** (`https://` or `http://localhost`) to grant camera access. Opening `index.html` directly via `file://` will be blocked by browser security policies.
+DEWGLASS is hosted on GitHub Pages over HTTPS, so you can access the live mirror directly in your browser and grant camera permission when prompted.
+
+For local development, browsers also allow camera access on `http://localhost`. Opening `index.html` directly via `file://` is not supported because of browser security restrictions.
 
 ### Local Development Server
 
