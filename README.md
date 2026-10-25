@@ -80,8 +80,19 @@ The mirror pipeline is rendered continuously through a multi-layer 2D canvas com
 
 ## Static Deployment
 
-The project consists solely of static assets:
-- `index.html` — Application entry point, styling, and logic
-- `assets/engraving.png` — Stylized mirror engraving asset
+DEWGLASS is a lightweight, single-page web application that can be hosted on any static hosting provider.
 
-Because all internal asset paths are relative (`assets/engraving.png`), the application can be hosted at the root of a domain or within any subpath on any static hosting provider (GitHub Pages, Cloudflare Pages, Netlify, Vercel, or an S3/Nginx bucket). Remote deployments require **HTTPS** for browser camera permissions.
+### Key Files
+
+- `index.html` — Main application, styling, interactive mirror, and embedded signature engraving.
+- `fog.html` — Redirect page for the mirror experience.
+- `assets/engraving.png` — Generic engraving image retained in the repository.
+- `server.py` — Lightweight local development server.
+
+### Live Demo
+
+Experience DEWGLASS on [GitHub Pages](https://sourav142005.github.io/DEWGLASS/).
+
+The application requires HTTPS (or `localhost` during development) for browser camera access. An internet connection is required to load the MediaPipe dependencies and tracking models from their configured CDN.
+
+**Privacy note:** The signature image is embedded directly in the public `index.html` source code. Although the separate `assets/signature.png` file is excluded from Git, the embedded signature can still be extracted by visitors to the public website.
