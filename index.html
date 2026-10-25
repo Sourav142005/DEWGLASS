@@ -1,0 +1,1780 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<title>DEWGLASS — Where dew meets reflection</title>
+<meta name="description" content="DEWGLASS — Where dew meets reflection. A liquid mirror for your webcam.">
+
+<style>
+:root {
+  --bg-dark: #05080e;
+  --bg-radial: radial-gradient(130% 90% at 50% -10%, #122438 0%, #080f19 50%, #03060a 100%);
+  --ink: #f8fafc;
+  --ink-secondary: #94a3b8;
+  --ink-tertiary: #64748b;
+  --accent-cyan: #38bdf8;
+  --accent-cyan-bright: #7dd3fc;
+  --accent-cyan-glow: rgba(56, 189, 248, 0.28);
+  --accent-blue: #0284c7;
+
+  /* Glass tokens */
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-hover: rgba(255, 255, 255, 0.075);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-specular: rgba(255, 255, 255, 0.28);
+  --glass-dock-bg: rgba(14, 20, 32, 0.42);
+  --glass-dock-border: rgba(255, 255, 255, 0.14);
+  --glass-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.65), 0 0 1px 1px rgba(255, 255, 255, 0.08) inset;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg-dark);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* ───────── Liquid Glass Welcome Screen ───────── */
+#start {
+  position: fixed; inset: 0; overflow-y: auto; overflow-x: hidden;
+  background: var(--bg-radial);
+}
+
+.steam-layer {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
+}
+.steam {
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.35; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(56, 189, 248, 0.12), transparent);
+  animation: drift 26s ease-in-out infinite alternate;
+}
+.steam.a { width: 65vmax; height: 65vmax; left: -15vmax; top: -20vmax; }
+.steam.b { width: 55vmax; height: 55vmax; right: -10vmax; bottom: -15vmax; animation-duration: 32s; animation-delay: -10s; background: radial-gradient(closest-side, rgba(30, 58, 138, 0.16), transparent); }
+@keyframes drift { to { transform: translate(6vmax, 4vmax) scale(1.12); } }
+
+.hero {
+  position: relative; z-index: 1; min-height: 100vh; box-sizing: border-box;
+  max-width: 1140px; margin: 0 auto;
+  padding: clamp(20px, 3vh, 36px) clamp(20px, 4vw, 44px);
+  display: grid; grid-template-columns: 1.18fr 0.82fr;
+  gap: clamp(20px, 3.5vw, 48px); align-items: center;
+}
+
+/* Eyebrow Pill */
+.eyebrow-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 13px; border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.24);
+  color: #bae6fd;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+.eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+  animation: pulseDot 3s ease-in-out infinite;
+}
+@keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
+
+h1 {
+  font-weight: 600; font-size: clamp(34px, 4.4vw, 56px); line-height: 1.06;
+  letter-spacing: -0.03em; margin: 0 0 8px; color: #fff;
+}
+h1 .accent {
+  background: linear-gradient(135deg, #ffffff 15%, #bae6fd 60%, #38bdf8 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.tagline {
+  font-size: clamp(15px, 1.3vw, 18px);
+  font-weight: 450;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: #bae6fd;
+  margin: 0 0 16px;
+  text-shadow: 0 2px 10px rgba(56, 189, 248, 0.18);
+}
+
+.lede {
+  font-size: clamp(14px, 1.15vw, 16px); line-height: 1.55;
+  color: var(--ink-secondary); max-width: 44ch; margin: 0 0 18px;
+}
+
+/* Privacy card with liquid glass */
+.privacy {
+  display: flex; gap: 12px; align-items: flex-start; max-width: 44ch;
+  padding: 11px 15px;
+  background: rgba(255, 255, 255, 0.035);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-top: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 14px;
+  font-size: 12.5px; line-height: 1.48; color: #cbd5e1;
+  margin: 0 0 22px;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.privacy svg { flex: none; margin-top: 2px; color: var(--accent-cyan); }
+.privacy b { color: #fff; font-weight: 600; }
+
+/* Liquid Glass CTA Button */
+#go {
+  appearance: none; border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: var(--font-sans); font-size: 15px; font-weight: 600; line-height: 1;
+  color: #031024;
+  padding: 14px 32px; border-radius: 9999px;
+  background: linear-gradient(180deg, #ffffff 0%, #e0f2fe 100%);
+  box-shadow: 0 12px 32px -6px rgba(56, 189, 248, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s;
+}
+#go svg { transition: transform 0.2s ease; }
+#go:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 42px -6px rgba(56, 189, 248, 0.52), 0 0 0 1px #fff inset;
+}
+#go:hover:not(:disabled) svg { transform: translateX(3px); }
+#go:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+#go:focus-visible {
+  outline: 3px solid var(--accent-cyan); outline-offset: 4px;
+}
+#go:disabled { opacity: 0.65; cursor: progress; }
+
+#err { min-height: 1.2em; margin: 10px 0 0; color: #fda4af; font-size: 13px; line-height: 1.4; max-width: 46ch; }
+#note { margin: 6px 0 0; color: var(--ink-tertiary); font-size: 12.5px; max-width: 46ch; }
+
+/* Vanity mirror frame */
+.vanity { justify-self: center; width: min(100%, 280px); }
+.mirror {
+  position: relative; aspect-ratio: 3/4; border-radius: 50%;
+  padding: 10px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.28) 0%, rgba(203, 213, 225, 0.12) 25%, rgba(255, 255, 255, 0.03) 60%, rgba(15, 23, 42, 0.85) 100%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 24px 60px -12px rgba(0, 0, 0, 0.85), 0 0 35px rgba(186, 230, 253, 0.08);
+  overflow: hidden;
+}
+.mirror::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.05) 48%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.05) 52%, transparent 62%);
+  animation: glassSheen 14s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes glassSheen {
+  0%, 20% { transform: translateX(-120%) rotate(15deg); }
+  55%, 100% { transform: translateX(120%) rotate(15deg); }
+}
+.mirror svg { display: block; width: 100%; height: 100%; border-radius: 50%; }
+.caption { margin: 12px 0 0; text-align: center; font-size: 11.5px; color: var(--ink-tertiary); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500; }
+
+.sig-engraving {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 0.5px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 1.5px rgba(186, 230, 253, 0.22));
+  transition: filter 0.3s ease;
+}
+.sig-engraving:hover {
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 1px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 2.5px rgba(186, 230, 253, 0.35));
+}
+.drip-bead {
+  animation: trickle 8s ease-in infinite;
+  opacity: 0;
+}
+.drip-bead.d2 { animation-delay: -3s; }
+.drip-bead.d3 { animation-delay: -5.5s; }
+@keyframes trickle {
+  0% { transform: translateY(0); opacity: 0; }
+  12% { opacity: 0.9; }
+  85% { opacity: 0.6; }
+  100% { transform: translateY(180px); opacity: 0; }
+}
+.mist-pulse {
+  animation: mistPulse 8s ease-in-out infinite alternate;
+}
+@keyframes mistPulse {
+  0% { opacity: 0.88; }
+  100% { opacity: 0.98; }
+}
+
+/* Liquid Glass Feature Cards */
+.how {
+  grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 12px 0 0; padding: 0; list-style: none;
+}
+.how li {
+  padding: 16px 18px; border-radius: 16px;
+  background: rgba(255, 255, 255, 0.035);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-top: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 10px 26px -8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, background 0.25s;
+}
+.how li:hover {
+  transform: translateY(-2px);
+  border-color: rgba(186, 230, 253, 0.28);
+  background: rgba(255, 255, 255, 0.055);
+}
+.step-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e0f2fe; font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  margin-bottom: 10px;
+}
+.how h3 { margin: 0 0 5px; font-size: 14.5px; font-weight: 600; color: #fff; }
+.how p { margin: 0; font-size: 12.5px; line-height: 1.48; color: var(--ink-secondary); }
+
+/* Keys row */
+.keys {
+  grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: center;
+  color: var(--ink-tertiary); font-size: 12px; margin-top: 6px;
+}
+.keys span { display: inline-flex; gap: 6px; align-items: center; }
+kbd {
+  font: 600 11px var(--font-mono); color: var(--ink);
+  padding: 2px 7px; border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 860px) {
+  body { overflow: auto; }
+  .hero { grid-template-columns: 1fr; padding: 24px 20px 36px; gap: 24px; }
+  .vanity { order: -1; width: min(65%, 240px); }
+  .how { grid-template-columns: 1fr; gap: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steam, .eyebrow-dot, .mirror::after, .drip-bead, .mist-pulse, .sig-engraving {
+    animation: none !important;
+  }
+  .drip-bead { opacity: 0.8 !important; }
+}
+
+/* ───────── THE MIRROR STAGE ───────── */
+#stage { position: fixed; inset: 0; background: #000; display: none; overflow: hidden; }
+#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#cam { position: fixed; left: 0; top: 0; width: 2px; height: 2px; opacity: 0; pointer-events: none; }
+
+/* Mirror Surface Bevel, Restrained Vignette & Cool Specular Highlights */
+.mirror-overlay {
+  position: absolute; inset: 0; pointer-events: none; z-index: 5;
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.6),
+    inset 1px 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset -1px 0 1px 0 rgba(255, 255, 255, 0.15);
+  background:
+    /* Restrained perimeter vignette: center is 100% transparent so face is crystal sharp */
+    radial-gradient(ellipse 92% 86% at 50% 50%, transparent 68%, rgba(2, 6, 14, 0.18) 86%, rgba(2, 6, 14, 0.42) 100%),
+    /* Soft cool specular sheen across top-left corner */
+    linear-gradient(135deg, rgba(224, 242, 254, 0.04) 0%, rgba(186, 230, 253, 0.02) 20%, transparent 45%, transparent 80%, rgba(56, 189, 248, 0.02) 100%),
+    /* Subtle cool top specular highlight simulating ambient room light on beveled glass */
+    radial-gradient(ellipse 48% 28% at 20% 0%, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+}
+
+/* Floating Hint Pill */
+.hint {
+  position: fixed; left: 50%; top: 22px; transform: translateX(-50%); z-index: 15;
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 7px 18px; border-radius: 9999px;
+  font-size: 12.5px; font-weight: 500; color: #e2e8f0; white-space: nowrap;
+  background: rgba(10, 16, 28, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: opacity 1.2s, transform 0.4s ease; pointer-events: none;
+}
+.hint-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+.hint.gone { opacity: 0; transform: translate(-50%, -10px); }
+
+/* Floating Liquid Glass Dock */
+.dock {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 15;
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 8px; border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(14, 20, 32, 0.38) 32%, rgba(10, 16, 28, 0.52) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  box-shadow:
+    0 16px 40px -8px rgba(0, 0, 0, 0.50),
+    0 4px 12px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  user-select: none; -webkit-user-select: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+}
+
+.dock-btn {
+  position: relative; appearance: none; border: 0; cursor: pointer;
+  width: 38px; height: 38px; border-radius: 50%;
+  display: grid; place-items: center; color: rgba(241, 245, 249, 0.88);
+  background: transparent;
+  transition: background 0.15s ease, transform 0.12s ease, color 0.15s ease, box-shadow 0.15s ease;
+  padding: 0;
+  touch-action: none;
+}
+.dock-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+}
+.dock-btn:active {
+  transform: translateY(0) scale(0.93);
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+.dock-btn.active, .dock-btn[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28), 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+.dock-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.65); outline-offset: 2px;
+}
+
+.dock-divider {
+  width: 1px; height: 18px;
+  background: rgba(255, 255, 255, 0.14);
+  margin: 0 2px;
+}
+
+/* Floating shutter button */
+.shutter {
+  position: relative; appearance: none; border: 0; cursor: pointer;
+  width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; color: #fff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-top: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s, background 0.15s;
+  padding: 0;
+  touch-action: none;
+}
+.shutter:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.16) 100%);
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 #ffffff;
+  transform: translateY(-1px) scale(1.04);
+}
+.shutter:active { transform: translateY(0) scale(0.93); }
+.shutter:focus-visible { outline: 2px solid rgba(255, 255, 255, 0.65); outline-offset: 2px; }
+
+/* Tooltip on dock items */
+.dock-tooltip {
+  position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(4px);
+  padding: 4px 10px; border-radius: 8px;
+  background: rgba(10, 16, 26, 0.88); border: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  color: #f8fafc; font-size: 11.5px; font-weight: 500; white-space: nowrap;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+.dock-btn:hover .dock-tooltip, .shutter:hover .dock-tooltip {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock, .dock-btn, .shutter, .dock-tooltip {
+    transition: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .dock-btn:hover, .shutter:hover, .dock-btn:active, .shutter:active {
+    transform: none !important;
+  }
+}
+
+/* Liquid Glass HUD (Hidden by default, toggled with D) */
+#hud {
+  position: fixed; left: 20px; top: 20px; z-index: 20; display: none; margin: 0;
+  padding: 14px 18px; border-radius: 18px;
+  background: rgba(10, 16, 26, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  color: #e0f2fe;
+  font: 12px/1.55 var(--font-mono); white-space: pre; pointer-events: none;
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 1px 1px rgba(255, 255, 255, 0.08) inset;
+}
+
+#flash { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 9; transition: opacity 0.35s; }
+#flash.on { opacity: 0.8; transition: none; }
+
+#fatal {
+  position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 20; display: none; max-width: min(90vw, 640px);
+  padding: 14px 20px; border-radius: 16px;
+  background: rgba(90, 29, 23, 0.88); border: 1px solid rgba(255, 180, 168, 0.3);
+  color: #ffd9d3; font: 13px/1.45 var(--font-mono);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steam, .w1, .w2, .drop, .eyebrow-dot { animation: none; }
+  .w1, .w2 { stroke-dashoffset: 0; }
+  * { transition-duration: 0.01ms !important; }
+}
+</style>
+
+<!-- Pinned MediaPipe builds. Unpinned versions pull a broken build. -->
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+<!-- ═════════ START SCREEN ═════════ -->
+
+<main id="start">
+
+  <div class="steam-layer" aria-hidden="true"><div class="steam a"></div><div class="steam b"></div></div>
+
+  <div class="hero">
+
+    <section>
+
+      <div class="eyebrow-pill">
+        <span class="eyebrow-dot"></span>
+        Spatial Web Mirror &middot; Computer Vision
+      </div>
+
+      <h1>DEW<span class="accent">GLASS</span></h1>
+
+      <p class="tagline">Where dew meets reflection.</p>
+
+      <p class="lede">A liquid mirror for your webcam. Condense digital fog with natural facial gestures, erase with fingertip precision, and clear swaths with a wave of your fist.</p>
+
+      <div class="privacy">
+
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+
+        <span><b>Privacy First.</b> Camera frames are processed strictly in this browser tab. No frames, audio, or video data ever leave your machine.</span>
+
+      </div>
+
+      <button id="go" type="button">
+        <span>Enter the Mirror</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+
+      <p id="err" role="alert"></p>
+
+      <p id="note"></p>
+
+    </section>
+
+    <aside class="vanity" aria-hidden="true">
+
+      <div class="mirror">
+
+        <svg viewBox="0 0 300 400">
+
+          <defs>
+
+            <!-- Room background reflection: sophisticated dark smoked glass -->
+            <linearGradient id="roomBg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0d1422"/>
+              <stop offset="55%" stop-color="#080d16"/>
+              <stop offset="100%" stop-color="#03060a"/>
+            </linearGradient>
+
+            <!-- Ambient window / light silhouette reflection: soft studio light -->
+            <linearGradient id="windowLight" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.07"/>
+              <stop offset="55%" stop-color="#334155" stop-opacity="0.02"/>
+              <stop offset="100%" stop-color="#000000" stop-opacity="0.25"/>
+            </linearGradient>
+
+            <!-- Natural edge condensation & moisture gradients (clustered near cooler perimeter) -->
+            <radialGradient id="edgeFrost" cx="50%" cy="50%" r="50%" fx="50%" fy="38%">
+              <stop offset="0%" stop-color="#e2f8ff" stop-opacity="0"/>
+              <stop offset="55%" stop-color="#e2f8ff" stop-opacity="0.03"/>
+              <stop offset="78%" stop-color="#bae6fd" stop-opacity="0.14"/>
+              <stop offset="92%" stop-color="#dbeafe" stop-opacity="0.24"/>
+              <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.32"/>
+            </radialGradient>
+
+            <linearGradient id="topFrost" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.20"/>
+              <stop offset="35%" stop-color="#bae6fd" stop-opacity="0.08"/>
+              <stop offset="75%" stop-color="#bae6fd" stop-opacity="0"/>
+            </linearGradient>
+
+            <linearGradient id="bottomFrost" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.18"/>
+              <stop offset="30%" stop-color="#bae6fd" stop-opacity="0.06"/>
+              <stop offset="70%" stop-color="#bae6fd" stop-opacity="0"/>
+            </linearGradient>
+
+            <!-- Bevel rim reflection gradient: crisp silver with subtle icy sheen -->
+            <linearGradient id="rimReflect" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.65"/>
+              <stop offset="25%" stop-color="#cbd5e1" stop-opacity="0.35"/>
+              <stop offset="70%" stop-color="#ffffff" stop-opacity="0.08"/>
+              <stop offset="100%" stop-color="#020617" stop-opacity="0.55"/>
+            </linearGradient>
+
+            <!-- Soft diffused counter/shelf reflection at bottom -->
+            <linearGradient id="lowerReflection" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0e1726" stop-opacity="0"/>
+              <stop offset="45%" stop-color="#080e1a" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#04070e" stop-opacity="0.55"/>
+            </linearGradient>
+
+            <!-- Clean interior room reflection scene -->
+            <g id="mirrorScene">
+              <rect width="300" height="400" fill="url(#roomBg)"/>
+              <!-- Soft architectural shapes simulating an elegant room/window reflection -->
+              <rect x="36" y="30" width="98" height="150" rx="14" fill="url(#windowLight)"/>
+              <rect x="166" y="30" width="98" height="150" rx="14" fill="url(#windowLight)"/>
+              <line x1="150" y1="20" x2="150" y2="190" stroke="#1e293b" stroke-width="1.5" opacity="0.35"/>
+              <line x1="30" y1="110" x2="270" y2="110" stroke="#1e293b" stroke-width="1.5" opacity="0.35"/>
+              <!-- Ambient interior counter / vanity edge reflection at the bottom: softly blended -->
+              <path d="M 0 320 C 80 305, 220 305, 300 320 L 300 400 L 0 400 Z" fill="url(#lowerReflection)"/>
+              <ellipse cx="150" cy="318" rx="75" ry="4" fill="#bae6fd" opacity="0.02"/>
+            </g>
+
+          </defs>
+
+          <!-- 1. The deep clear room reflection in glass -->
+          <use href="#mirrorScene"/>
+
+          <!-- 2. Condensation / Frost layer: concentrated at perimeter, keeping center smoked glass pristine -->
+          <g class="mist-pulse">
+            <rect width="300" height="400" fill="url(#edgeFrost)"/>
+            <rect width="300" height="150" fill="url(#topFrost)"/>
+            <rect y="250" width="300" height="150" fill="url(#bottomFrost)"/>
+            <ellipse cx="150" cy="200" rx="144" ry="192" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8"/>
+          </g>
+
+          <!-- 3. Silver-White Stylized Engraving -->
+          <g class="sig-engraving">
+            <image href="assets/engraving.png" x="43" y="152" width="240" height="81.5" preserveAspectRatio="xMidYMid meet"/>
+          </g>
+
+          <!-- 4. Water droplets and condensation beads -->
+          <g id="droplets">
+            <!-- Top condensation clusters -->
+            <g transform="translate(68, 65)">
+              <ellipse cx="0" cy="0" rx="3.5" ry="4" fill="#020617" fill-opacity="0.55"/>
+              <ellipse cx="0" cy="-0.5" rx="3" ry="3.5" fill="#bae6fd" fill-opacity="0.25"/>
+              <circle cx="-1" cy="-1.5" r="1" fill="#ffffff" fill-opacity="0.95"/>
+            </g>
+            <g transform="translate(82, 54)">
+              <ellipse cx="0" cy="0" rx="2.5" ry="3" fill="#020617" fill-opacity="0.45"/>
+              <ellipse cx="0" cy="-0.4" rx="2" ry="2.5" fill="#bae6fd" fill-opacity="0.22"/>
+              <circle cx="-0.8" cy="-1.2" r="0.8" fill="#ffffff" fill-opacity="0.95"/>
+            </g>
+            <g transform="translate(225, 48)">
+              <ellipse cx="0" cy="0" rx="3.5" ry="4.2" fill="#020617" fill-opacity="0.55"/>
+              <ellipse cx="0" cy="-0.5" rx="3" ry="3.8" fill="#bae6fd" fill-opacity="0.25"/>
+              <circle cx="-1" cy="-1.5" r="1.1" fill="#ffffff" fill-opacity="0.95"/>
+            </g>
+            <g transform="translate(242, 60)">
+              <ellipse cx="0" cy="0" rx="2" ry="2.5" fill="#020617" fill-opacity="0.45"/>
+              <ellipse cx="0" cy="-0.3" rx="1.6" ry="2" fill="#bae6fd" fill-opacity="0.22"/>
+              <circle cx="-0.6" cy="-1" r="0.7" fill="#ffffff" fill-opacity="0.95"/>
+            </g>
+            <!-- Micro-beads along the mirror perimeter and cooler zones -->
+            <circle cx="150" cy="22" r="1.8" fill="#bae6fd" fill-opacity="0.7"/>
+            <circle cx="162" cy="25" r="1.2" fill="#ffffff" fill-opacity="0.8"/>
+            <circle cx="138" cy="26" r="1.4" fill="#ffffff" fill-opacity="0.8"/>
+            <circle cx="45" cy="140" r="1.6" fill="#ffffff" fill-opacity="0.55"/>
+            <circle cx="256" cy="145" r="1.5" fill="#ffffff" fill-opacity="0.55"/>
+            <circle cx="262" cy="240" r="1.8" fill="#ffffff" fill-opacity="0.5"/>
+            <circle cx="60" cy="248" r="1.5" fill="#ffffff" fill-opacity="0.5"/>
+            <circle cx="240" cy="265" r="1.7" fill="#ffffff" fill-opacity="0.5"/>
+
+            <!-- Animated trickling drip beads with tear trails -->
+            <g class="drip-bead" transform="translate(176, 248)">
+              <line x1="0" y1="-8" x2="0" y2="0" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+              <ellipse cx="0" cy="0" rx="2.8" ry="3.8" fill="#020617" fill-opacity="0.5"/>
+              <ellipse cx="0" cy="-0.4" rx="2.4" ry="3.2" fill="#bae6fd" fill-opacity="0.3"/>
+              <circle cx="-0.8" cy="-1.2" r="0.9" fill="#ffffff" fill-opacity="0.95"/>
+            </g>
+
+            <g class="drip-bead d2" transform="translate(68, 75)">
+              <line x1="0" y1="-10" x2="0" y2="0" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
+              <ellipse cx="0" cy="0" rx="2.4" ry="3.2" fill="#020617" fill-opacity="0.45"/>
+              <ellipse cx="0" cy="-0.3" rx="2" ry="2.8" fill="#bae6fd" fill-opacity="0.25"/>
+              <circle cx="-0.7" cy="-1" r="0.8" fill="#ffffff" fill-opacity="0.95"/>
+            </g>
+
+            <g class="drip-bead d3" transform="translate(225, 58)">
+              <line x1="0" y1="-12" x2="0" y2="0" stroke="rgba(255,255,255,0.25)" stroke-width="0.9"/>
+              <ellipse cx="0" cy="0" rx="2.6" ry="3.5" fill="#020617" fill-opacity="0.45"/>
+              <ellipse cx="0" cy="-0.4" rx="2.2" ry="3" fill="#bae6fd" fill-opacity="0.25"/>
+              <circle cx="-0.8" cy="-1.1" r="0.9" fill="#ffffff" fill-opacity="0.95"/>
+            </g>
+          </g>
+
+          <!-- 5. Glass Inner Bevel & Specular Highlight -->
+          <ellipse cx="150" cy="200" rx="146" ry="196" fill="none" stroke="url(#rimReflect)" stroke-width="1.8"/>
+          <ellipse cx="150" cy="200" rx="144" ry="194" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+        </svg>
+
+      </div>
+
+      <p class="caption">BREATHE &middot; TOUCH &middot; REVEAL</p>
+
+    </aside>
+
+    <ul class="how">
+
+      <li>
+        <span class="step-num">01</span>
+        <h3>Breathe to Fog</h3>
+        <p>Blow or shape your lips toward the webcam. Realistic condensation blooms instantly around your mouth.</p>
+      </li>
+
+      <li>
+        <span class="step-num">02</span>
+        <h3>Pinch to Draw</h3>
+        <p>Bring thumb and index finger together to etch fine, finger-sized lines through the frost.</p>
+      </li>
+
+      <li>
+        <span class="step-num">03</span>
+        <h3>Fist to Wipe</h3>
+        <p>Close your hand into a fist to wipe away a broad area of the mirror in a single fluid stroke.</p>
+      </li>
+
+    </ul>
+
+    <div class="keys">
+
+      <span><kbd>Space</kbd> hold to test fog</span>
+
+      <span><kbd>A</kbd> hold for ambient fog</span>
+
+      <span><kbd>C</kbd> clear drawing</span>
+
+      <span><kbd>S</kbd> save photo</span>
+
+      <span><kbd>D</kbd> diagnostics HUD</span>
+
+      <span><kbd>Esc</kbd> exit mirror</span>
+
+    </div>
+
+  </div>
+
+</main>
+
+<!-- ═════════ THE MIRROR ═════════ -->
+
+<div id="stage">
+
+  <canvas id="view"></canvas>
+
+  <div class="mirror-overlay" aria-hidden="true"></div>
+
+  <video id="cam" playsinline muted></video>
+
+  <div class="hint" id="hint">
+    <span class="hint-dot"></span>
+    <span>pinch to draw &middot; fist to wipe &middot; blow or hold space to fog</span>
+  </div>
+
+  <pre id="hud"></pre>
+
+  <!-- Liquid Glass Floating Toolbar -->
+  <nav class="dock" aria-label="Mirror controls">
+
+    <button class="dock-btn" id="btnExit" type="button" aria-label="Exit mirror" title="Exit to welcome (Esc)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span class="dock-tooltip">Exit (Esc)</span>
+    </button>
+
+    <div class="dock-divider" aria-hidden="true"></div>
+
+    <button class="dock-btn" id="btnAmbient" type="button" aria-label="Hold for ambient fog" title="Hold for ambient fog (A)" aria-pressed="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 16a4 4 0 0 1-.88-7.9 5 5 0 0 1 9.76-1.5A4.5 4.5 0 0 1 20 15H7Z"/>
+        <path d="M4 20h16"/>
+      </svg>
+      <span class="dock-tooltip">Hold to Fog (A)</span>
+    </button>
+
+    <button class="dock-btn" id="btnClear" type="button" aria-label="Clear drawing" title="Clear fog & drawing (C)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/></svg>
+      <span class="dock-tooltip">Clear (C)</span>
+    </button>
+
+    <button class="dock-btn" id="btnHud" type="button" aria-label="Toggle diagnostics" title="Toggle diagnostics (D)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+      <span class="dock-tooltip">Diagnostics (D)</span>
+    </button>
+
+    <div class="dock-divider" aria-hidden="true"></div>
+
+    <button class="shutter" id="shutter" type="button" aria-label="Save photo" title="Save snapshot (S)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span class="dock-tooltip">Snapshot (S)</span>
+    </button>
+
+  </nav>
+
+</div>
+
+<div id="flash"></div>
+
+<div id="fatal"></div>
+<script>
+'use strict';
+
+/* ════════ Tuned values ════════ */
+const CFG = {
+  // fog + breath
+  fogStart: 0.55,
+  blur: 18, bright: 1.18, tint: '242,238,231', white: 0.62,
+  blobs: 9, blobEvery: 2, spreadX: 1.12, blobBlur: 0.60, reach: 0.19, blobAlpha: 0.42, below: 0.035,
+  faceEvery: 2, faceEase: 0.4, // FaceMesh runs every 2 frames for responsive real-time tracking
+  evaporation: 0.015,
+
+  // Real-world webcam facial gesture blowing detection:
+  gesturePursedRatio: 0.88,       // mouth width contraction relative to resting baseline (<= 88% triggers)
+  gestureAspectOuterMin: 0.44,    // outer lip vertical/horizontal aspect ratio (puckering forward >= 0.44)
+  gesturePursedRatioStrong: 0.80, // tight pursing triggers even if lips are thin
+  gestureAspectOuterStrong: 0.52, // prominent forward pucker triggers with slight narrowing (<= 93%)
+  gestureNormHMax: 0.08,          // inner vertical opening ceiling (rejects wide open mouth / gasping / yawn)
+  gestureAspectInnerMax: 0.60,    // inner aspect ceiling to reject speech vowels
+  gestureConfirmFrames: 2,        // frames to confirm deliberate blowing gesture (~60-100ms)
+  gestureReleaseFrames: 3,        // frames of relaxed lips before ending blow (debounces tracking blips)
+  gestureAttackEase: 0.35,        // smooth rise speed of condensation
+  gestureDecayEase: 0.22,         // smooth fade out speed of condensation
+  gestureBaselineRate: 0.015,     // adaptation rate towards user's resting mouth width
+
+  // drawing
+  brushSize: 10,
+  ease1: 0.45, ease2: 0.22, tremor: 0.0006, releaseMs: 250, releaseFrames: 2, starEase: 0.55,
+  pinchDown: 0.22, pinchUp: 0.38,
+
+  // fist wipe
+  wipeMul: 1.6, wipeAlpha: 0.34, maxStamps: 40, jump: 0.30,
+  fistWipeRadius: 0.20, // radius as a fraction of the shorter mirror dimension
+};
+
+const HANDS_URL = 'https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/';
+const FACEMESH_URL = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/';
+const TAU = Math.PI * 2;
+
+/* ════════ Elements & canvases ════════ */
+const $ = id => document.getElementById(id);
+const startEl = $('start'), stageEl = $('stage'), view = $('view'), video = $('cam');
+const goBtn = $('go'), errEl = $('err'), noteEl = $('note');
+const hintEl = $('hint'), hudEl = $('hud'), fatalEl = $('fatal');
+const vctx = view.getContext('2d');
+
+const fogC   = document.createElement('canvas');  // alpha mask: how much fog at each pixel (never shown directly)
+const fctx   = fogC.getContext('2d');
+const frostC = document.createElement('canvas');  // blurred camera, masked by the fog canvas
+const fr     = frostC.getContext('2d');
+const smallC = document.createElement('canvas');  // low-res camera used to make the blur cheap
+const sm     = smallC.getContext('2d');
+const dropC  = document.createElement('canvas');  // condensation droplets canvas
+const dctx   = dropC.getContext('2d');
+const hasFilter = 'filter' in CanvasRenderingContext2D.prototype;  // Safari lacks ctx.filter
+
+/* ════════ Erasing: defined in outer shared scope before any usage ════════ */
+function fistStamp(x, y, r) {
+  // Broad, soft-edged wipe: the fist clears a large swath of the mirror cleanly.
+  const g = fctx.createRadialGradient(x, y, r * 0.52, x, y, r);
+  g.addColorStop(0, 'rgba(0,0,0,1)');
+  g.addColorStop(0.8, 'rgba(0,0,0,0.96)');
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  fctx.globalCompositeOperation = 'destination-out';
+  fctx.fillStyle = g;
+  fctx.fillRect(x - r, y - r, r * 2, r * 2);
+  fctx.globalCompositeOperation = 'source-over';
+}
+window.fistStamp = fistStamp;
+const stamp = fistStamp; // backwards-compatible alias
+window.stamp = fistStamp;
+
+const BRUSH_SIZE = 10;
+CFG.brushSize = BRUSH_SIZE;
+window.brushSize = BRUSH_SIZE;
+const brushR = () => (CFG.brushSize || 10) * dpr;
+
+function penDot(x, y) {
+  fctx.globalCompositeOperation = 'destination-out';
+  fctx.fillStyle = '#000';
+  fctx.beginPath(); fctx.arc(x, y, brushR(), 0, TAU); fctx.fill();
+  fctx.globalCompositeOperation = 'source-over';
+}
+
+function penCurve(x0, y0, cx, cy, x1, y1) {
+  fctx.globalCompositeOperation = 'destination-out';
+  fctx.strokeStyle = '#000';
+  fctx.lineWidth = brushR() * 2; fctx.lineCap = 'round'; fctx.lineJoin = 'round';
+  fctx.beginPath(); fctx.moveTo(x0, y0); fctx.quadraticCurveTo(cx, cy, x1, y1); fctx.stroke();
+  fctx.globalCompositeOperation = 'source-over';
+}
+
+let dpr = 1, W = 0, H = 0, bs = 0.25, fogReady = false;
+let droplets = [];
+let evapAccum = 0;
+
+/* ════════ Ambient Fog State & Hold Logic ════════ */
+const ambientFog = {
+  enabled: false,
+  active: false,
+  rate: 0.024,
+  every: 2
+};
+window.ambientFog = ambientFog;
+
+let pointerHeld = false;
+let aKeyDown = false;
+
+function setAmbientHolding(active) {
+  const isHeld = !!active;
+  ambientFog.enabled = isHeld;
+  ambientFog.active = isHeld;
+  const btn = $('btnAmbient');
+  if (btn) {
+    btn.setAttribute('aria-pressed', isHeld ? 'true' : 'false');
+    btn.classList.toggle('active', isHeld);
+  }
+}
+window.setAmbientHolding = setAmbientHolding;
+window.toggleAmbientFog = function(force) {
+  if (typeof force === 'boolean') setAmbientHolding(force);
+  else setAmbientHolding(!ambientFog.enabled);
+};
+window.setAmbientSpeed = function() {}; // Safe stub for backwards compatibility
+
+/* ════════ State ════════ */
+let running = false, rafId = 0, busy = false, sent = 0, frameN = 0;
+let stream = null;
+let hands = null, faces = null;
+let lastKey = -1e9, spaceDown = false, showHud = false, saveReq = false;
+let lastT = 0, fps = 0, hintTimer = null;
+
+const faceGesture = {
+  pts: null,
+  t: 0,
+  normW: 0.38,
+  normH: 0,
+  aspectInner: 0,
+  aspectOuter: 0,
+  pursedRatio: 1.0,
+  baselineWidth: null, // Snaps to user's real resting width on first tracked frame
+  confirmFrames: 0,
+  releaseFrames: 0,
+  isBlowing: false,
+  strength: 0,
+  prevNormW: 0.38,
+  isCandidate: false
+};
+const fogCenter = { x: 0, y: 0 }, mouth = { x: 0, y: 0 };
+const hand = { pts: null, t: 0, ratio: 9, pinch: false, fist: false, fistFrames: 0, indexExt: false, width: 0 };
+const pen  = { down: false, raw: null, brush: null, last: null, mid0: null, relCount: 0, relSince: 0 };
+const star = { x: 0, y: 0, on: false };
+const wipe = { raw: null, last: null, active: false, r: 0 };
+
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const rnd = Math.random;
+
+/* ════════ Sizing (everything in device pixels, dpr capped at 2) ════════ */
+function resize() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const nw = Math.max(2, Math.round(innerWidth * dpr));
+  const nh = Math.max(2, Math.round(innerHeight * dpr));
+  if (nw === W && nh === H) return;
+
+  let keep = null;
+  if (fogReady) {
+    keep = document.createElement('canvas');
+    keep.width = fogC.width;
+    keep.height = fogC.height;
+    keep.getContext('2d').drawImage(fogC, 0, 0);
+  }
+
+  W = nw; H = nh;
+  view.width = W; view.height = H;
+  frostC.width = W; frostC.height = H;
+  bs = hasFilter ? 0.25 : 0.08;
+  smallC.width = Math.max(2, Math.ceil(W * bs));
+  smallC.height = Math.max(2, Math.ceil(H * bs));
+  fogC.width = W; fogC.height = H;
+  dropC.width = W; dropC.height = H;
+
+  if (keep) fctx.drawImage(keep, 0, 0, W, H); else resetFog();
+  seedDroplets();
+  fogReady = true;
+  fogCenter.x = mouth.x = W / 2;
+  fogCenter.y = mouth.y = H * 0.5;
+}
+
+function resetFog() {
+  fctx.globalCompositeOperation = 'source-over';
+  fctx.clearRect(0, 0, W, H);
+  fctx.globalAlpha = 1;
+  if (dctx) dctx.clearRect(0, 0, W, H);
+  evapAccum = 0;
+}
+
+function seedDroplets() {
+  droplets = [];
+  if (!W || !H) return;
+  const count = Math.min(240, Math.max(60, Math.round((W * H) / 12000)));
+  for (let i = 0; i < count; i++) {
+    const isTrickler = (rnd() < 0.12); // ~12% tricklers, rest are clinging condensation beads
+    const r = dpr * (0.75 + Math.pow(rnd(), 2) * 2.2);
+    const opacity = isTrickler ? (0.28 + rnd() * 0.32) : (0.22 + rnd() * 0.38);
+    droplets.push({
+      x: rnd() * W,
+      y: rnd() * H,
+      r,
+      isTrickler,
+      vy: isTrickler ? dpr * (4 + rnd() * 9) : 0,
+      drift: isTrickler ? (rnd() - 0.5) * dpr * 1.5 : 0,
+      phase: rnd() * TAU,
+      opacity,
+      c0: `rgba(255,255,255,${(opacity * 0.95).toFixed(3)})`,
+      c1: `rgba(224,242,254,${(opacity * 0.55).toFixed(3)})`,
+      c2: `rgba(20,45,70,${(opacity * 0.35).toFixed(3)})`,
+      stroke: `rgba(255,255,255,${(opacity * 0.8).toFixed(3)})`,
+      pin: `rgba(255,255,255,${(opacity * 0.95).toFixed(3)})`
+    });
+  }
+}
+
+function updateDroplets(dt) {
+  if (!W || !H || !droplets.length) return;
+  dctx.clearRect(0, 0, W, H);
+  dctx.globalCompositeOperation = 'source-over';
+
+  const t = performance.now();
+  for (const drop of droplets) {
+    if (drop.isTrickler) {
+      drop.y += drop.vy * dt;
+      drop.x += (drop.drift + Math.sin(t * 0.00045 + drop.phase) * dpr * 0.5) * dt;
+      if (drop.y - drop.r > H) {
+        drop.y = -drop.r * 2;
+        drop.x = rnd() * W;
+      }
+      if (drop.x < -drop.r) drop.x = W + drop.r;
+      if (drop.x > W + drop.r) drop.x = -drop.r;
+    }
+
+    const r = drop.r;
+    dctx.save();
+    dctx.translate(drop.x, drop.y);
+    dctx.scale(0.85, 1.25);
+
+    // Realistic water droplet: refraction body + highlight
+    const body = dctx.createRadialGradient(-r * 0.25, -r * 0.3, r * 0.05, 0, 0, r * 1.2);
+    body.addColorStop(0, drop.c0);
+    body.addColorStop(0.35, drop.c1);
+    body.addColorStop(0.75, drop.c2);
+    body.addColorStop(1, 'rgba(255,255,255,0)');
+    dctx.fillStyle = body;
+    dctx.beginPath();
+    dctx.ellipse(0, 0, r, r * 1.2, 0, 0, TAU);
+    dctx.fill();
+
+    // Delicate specular highlight arc
+    dctx.strokeStyle = drop.stroke;
+    dctx.lineWidth = Math.max(0.5, dpr * 0.45);
+    dctx.beginPath();
+    dctx.arc(-r * 0.12, -r * 0.16, r * 0.55, Math.PI * 1.05, Math.PI * 1.75);
+    dctx.stroke();
+
+    // Specular pin-dot glint
+    dctx.fillStyle = drop.pin;
+    dctx.fillRect(-r * 0.32, -r * 0.42, Math.max(0.7, dpr * 0.7), Math.max(0.7, dpr * 0.7));
+
+    dctx.restore();
+  }
+
+  // Droplets only appear where there is condensation; wiping erases both
+  dctx.globalCompositeOperation = 'destination-in';
+  dctx.drawImage(fogC, 0, 0);
+  dctx.globalCompositeOperation = 'source-over';
+}
+
+function evaporateFog(dt) {
+  if (dt <= 0 || !W || !H) return;
+  evapAccum += (CFG.evaporation || 0.015) * dt;
+  if (evapAccum < 0.008) return; // accumulate enough alpha step to overcome 8-bit canvas quantization
+  const step = Math.min(0.03, evapAccum);
+  evapAccum -= step;
+  fctx.save();
+  fctx.globalCompositeOperation = 'destination-out';
+  fctx.globalAlpha = step;
+  fctx.fillStyle = '#000';
+  fctx.fillRect(0, 0, W, H);
+  fctx.restore();
+}
+
+/* Video is drawn "cover" style; landmarks must go through the same mapping. */
+function cover() {
+  const vw = video.videoWidth, vh = video.videoHeight;
+  const s = Math.max(W / vw, H / vh);
+  return { s, dw: vw * s, dh: vh * s, ox: (W - vw * s) / 2, oy: (H - vh * s) / 2 };
+}
+const mapPt = (m, l) => ({ x: W - (m.ox + l.x * m.dw), y: m.oy + l.y * m.dh });  // x is mirrored
+
+function drawVideoMirrored(ctx, w, h, pad) {
+  const s = Math.max(w / video.videoWidth, h / video.videoHeight) * pad;
+  const dw = video.videoWidth * s, dh = video.videoHeight * s;
+  ctx.save();
+  ctx.translate(w, 0); ctx.scale(-1, 1);
+  ctx.drawImage(video, (w - dw) / 2, (h - dh) / 2, dw, dh);
+  ctx.restore();
+}
+
+/* ════════ MediaPipe results ════════ */
+function onHands(res) {
+  if (!running) return;
+  const lm = res.multiHandLandmarks && res.multiHandLandmarks[0];
+  if (!lm) { hand.pts = null; hand.fistFrames = 0; return; }
+  const m = cover();
+  const p = lm.map(l => mapPt(m, l));
+  const d = (a, b) => Math.hypot(p[a].x - p[b].x, p[a].y - p[b].y);
+
+  const size = d(0, 9);                                  // wrist -> middle knuckle
+  hand.ratio = d(4, 8) / size;                           // pinch measured relative to hand size
+  if (hand.ratio < CFG.pinchDown) hand.pinch = true;
+  else if (hand.ratio > CFG.pinchUp) hand.pinch = false; // in between: hold state
+
+  hand.fist = [[8, 6], [12, 10], [16, 14], [20, 18]].every(([tip, mid]) => d(tip, 0) < d(mid, 0));
+  hand.fistFrames = hand.fist ? hand.fistFrames + 1 : 0;
+  hand.indexExt = d(8, 0) > d(6, 0);
+  hand.width = Math.max(d(5, 17), d(0, 9));              // a side-on fist flattens knuckle width, so take the larger
+  hand.pts = p;
+  hand.t = performance.now();
+}
+
+function onFace(res) {
+  if (!running) return;
+  const lm = res.multiFaceLandmarks && res.multiFaceLandmarks[0];
+  if (!lm) return;
+  const m = cover();
+  const p = lm.map(l => mapPt(m, l));
+  faceGesture.pts = p;
+  faceGesture.t = performance.now();
+
+  // Mouth center: midpoint of upper inner lip (13) and lower inner lip (14)
+  if (p[13] && p[14]) {
+    mouth.x = (p[13].x + p[14].x) / 2;
+    mouth.y = (p[13].y + p[14].y) / 2;
+  }
+}
+
+/* One rAF loop feeds MediaPipe, and only when the previous call has resolved. */
+function kick() {
+  if (busy || !running || video.readyState < 2) return;
+  busy = true;
+  (async () => {
+    if (hands && running) await hands.send({ image: video });
+    if (faces && running && ++sent % CFG.faceEvery === 0) await faces.send({ image: video });
+  })().then(() => { busy = false; }, e => {
+    busy = false;
+    if (running) console.warn('MediaPipe tracking frame warning:', e);
+  });
+}
+
+/* ════════ Webcam Facial Gesture Blowing Detection ════════ */
+function updateBlowingGesture(now) {
+  const fresh = faceGesture.pts && (now - faceGesture.t < 500);
+  if (!fresh) {
+    if (faceGesture.isBlowing) {
+      faceGesture.isBlowing = false;
+    }
+    faceGesture.confirmFrames = 0;
+    faceGesture.strength += (0 - faceGesture.strength) * (CFG.gestureDecayEase || 0.22);
+    if (faceGesture.strength < 0.01) faceGesture.strength = 0;
+    return;
+  }
+
+  const p = faceGesture.pts;
+  const d = (a, b) => Math.hypot(p[a].x - p[b].x, p[a].y - p[b].y);
+
+  // Normalization reference: combine cheek-to-cheek width and forehead-to-chin height
+  // Forehead (10) to chin (152) is vertical and immune to horizontal head yaw
+  const faceW = Math.max(1, d(234, 454));
+  const faceH = Math.max(1, d(10, 152));
+  const faceRef = (faceW + faceH * 0.72) / 2;
+
+  const mouthW = d(61, 291);      // mouth corners: 61 (left) and 291 (right)
+  const mouthH = d(13, 14);       // inner lips: 13 (upper inner) and 14 (lower inner)
+  const mouthOuterH = d(0, 17);   // outer lips: 0 (upper outer) and 17 (lower outer)
+
+  const normW = mouthW / faceRef;
+  const normH = mouthH / faceH;
+  const aspectInner = mouthW > 0 ? (mouthH / mouthW) : 0;
+  const aspectOuter = mouthW > 0 ? (mouthOuterH / mouthW) : 0;
+
+  faceGesture.normW = normW;
+  faceGesture.normH = normH;
+  faceGesture.aspectInner = aspectInner;
+  faceGesture.aspectOuter = aspectOuter;
+
+  // Initialize baseline immediately on first valid face detection
+  if (faceGesture.baselineWidth === null) {
+    faceGesture.baselineWidth = normW;
+  }
+
+  const pursedRatio = normW / Math.max(0.1, faceGesture.baselineWidth);
+  faceGesture.pursedRatio = pursedRatio;
+
+  // Running baseline adaptation:
+  // Only adapt when the user is in an un-pursed, resting expression
+  // NEVER adapt while pursing, blowing, or speaking with jaw dropped
+  if (!faceGesture.isBlowing && normW >= 0.22 && normW <= 0.58 && pursedRatio >= 0.92 && aspectOuter < 0.50 && normH < 0.06) {
+    faceGesture.baselineWidth += (normW - faceGesture.baselineWidth) * (CFG.gestureBaselineRate || 0.015);
+  }
+
+  // Multi-condition pursed blowing detection:
+  // 1. Moderate horizontal narrowing (<= 88% of baseline)
+  const isNarrowed = (pursedRatio <= (CFG.gesturePursedRatio || 0.88));
+
+  // 2. Forward lip puckering (outer lip height/width ratio >= 0.44)
+  const isPuckered = (aspectOuter >= (CFG.gestureAspectOuterMin || 0.44));
+
+  // 3. Reject wide open mouth (speech vowels like "Ah", yawning, gasping)
+  const notWideOpen = (normH <= (CFG.gestureNormHMax || 0.08)) && (aspectInner <= (CFG.gestureAspectInnerMax || 0.60));
+
+  // Combined flexible trigger:
+  // - Either: clear narrowing + forward puckering
+  // - Or: strong narrowing (<= 80% baseline) even with thin lips
+  // - Or: strong puckering (>= 0.52) with slight narrowing (<= 93%)
+  const isPursed = notWideOpen && (
+    (isNarrowed && isPuckered) ||
+    (pursedRatio <= (CFG.gesturePursedRatioStrong || 0.80)) ||
+    (aspectOuter >= (CFG.gestureAspectOuterStrong || 0.52) && pursedRatio <= 0.93)
+  );
+
+  faceGesture.isCandidate = isPursed;
+
+  // Temporal confirmation & debouncing:
+  // Require 2 consecutive frames to activate; require 3 frames to release
+  if (isPursed) {
+    faceGesture.confirmFrames = Math.min(8, faceGesture.confirmFrames + 1);
+    faceGesture.releaseFrames = 0;
+    if (faceGesture.confirmFrames >= (CFG.gestureConfirmFrames || 2)) {
+      faceGesture.isBlowing = true;
+    }
+  } else {
+    faceGesture.releaseFrames++;
+    if (faceGesture.releaseFrames >= (CFG.gestureReleaseFrames || 3)) {
+      faceGesture.confirmFrames = 0;
+      faceGesture.isBlowing = false;
+    }
+  }
+
+  // Smooth condensation envelope
+  if (faceGesture.isBlowing) {
+    const depth = clamp((0.92 - pursedRatio) / 0.18, 0.45, 1.0);
+    faceGesture.strength += (depth - faceGesture.strength) * (CFG.gestureAttackEase || 0.35);
+  } else {
+    faceGesture.strength += (0 - faceGesture.strength) * (CFG.gestureDecayEase || 0.22);
+    if (faceGesture.strength < 0.01) faceGesture.strength = 0;
+  }
+}
+
+function breathBlobs(strength) {
+  const short = Math.min(W, H);
+  const R = CFG.reach * short;
+  const cx = fogCenter.x, cy = fogCenter.y + CFG.below * short;  // breath falls
+  fctx.globalCompositeOperation = 'source-over';
+
+  // 1. Soft atmospheric base bloom (smooth organic vapor foundation)
+  const baseR = R * (0.65 + rnd() * 0.35);
+  const bg = fctx.createRadialGradient(cx, cy, 0, cx, cy, baseR);
+  const baseAl = CFG.blobAlpha * strength * 0.28;
+  bg.addColorStop(0, `rgba(255,255,255,${baseAl})`);
+  bg.addColorStop(0.5, `rgba(255,255,255,${baseAl * 0.6})`);
+  bg.addColorStop(1, 'rgba(255,255,255,0)');
+  fctx.fillStyle = bg;
+  fctx.fillRect(cx - baseR, cy - baseR, baseR * 2, baseR * 2);
+
+  // 2. Clustered organic condensation lobes with natural density variation
+  for (let i = 0; i < CFG.blobs; i++) {
+    const a = rnd() * TAU, d = Math.sqrt(rnd()) * R * 0.85;
+    const x = cx + Math.cos(a) * d * CFG.spreadX;                // breath drifts sideways
+    const y = cy + Math.sin(a) * d;
+    const r = R * (0.18 + 0.34 * rnd());
+    const g = fctx.createRadialGradient(x, y, 0, x, y, r);
+    const al = CFG.blobAlpha * strength * (0.65 + rnd() * 0.45);
+    g.addColorStop(0, `rgba(255,255,255,${al})`);
+    g.addColorStop(1 - CFG.blobBlur, `rgba(255,255,255,${al * 0.85})`);
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    fctx.fillStyle = g;
+    fctx.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+}
+
+/* ════════ Ambient Fog Buildup (Gradual Organic Condensation) ════════ */
+function applyAmbientFog(dt) {
+  if (!W || !H) return;
+  const short = Math.min(W, H);
+  const rate = ambientFog.rate || 0.024;
+  const alphaStep = rate * (dt / 0.016);
+
+  fctx.save();
+  fctx.globalCompositeOperation = 'source-over';
+
+  const count = 3;
+  for (let i = 0; i < count; i++) {
+    let cx, cy;
+    // Real condensation forms more readily around cooler perimeter & top (~45% bias)
+    if (rnd() < 0.45) {
+      const edge = rnd();
+      if (edge < 0.35) {
+        cx = rnd() * W;
+        cy = rnd() * H * 0.35;
+      } else if (edge < 0.65) {
+        cx = (rnd() < 0.5 ? rnd() * 0.22 : 1 - rnd() * 0.22) * W;
+        cy = rnd() * H;
+      } else {
+        cx = rnd() * W;
+        cy = (0.75 + rnd() * 0.25) * H;
+      }
+    } else {
+      cx = (0.10 + rnd() * 0.80) * W;
+      cy = (0.10 + rnd() * 0.80) * H;
+    }
+
+    const r = short * (0.18 + rnd() * 0.32);
+    const grad = fctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    const al = alphaStep * (0.60 + rnd() * 0.50);
+
+    grad.addColorStop(0, `rgba(255,255,255,${al})`);
+    grad.addColorStop(0.5, `rgba(255,255,255,${al * 0.65})`);
+    grad.addColorStop(0.85, `rgba(255,255,255,${al * 0.22})`);
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+
+    fctx.fillStyle = grad;
+    fctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+  }
+
+  fctx.restore();
+}
+
+function updateHand(now) {
+  const fresh = hand.pts && now - hand.t < 300;
+  const pinching = !!(fresh && hand.pinch);
+  const fist = !!(fresh && hand.fist && hand.fistFrames >= 2);
+
+  // target point for drawing = midpoint of thumb tip and index tip
+  let tx = 0, ty = 0;
+  if (fresh) {
+    tx = (hand.pts[4].x + hand.pts[8].x) / 2;
+    ty = (hand.pts[4].y + hand.pts[8].y) / 2;
+  }
+
+  /* ── pen (pinch drawing) ── */
+  if (fist) {
+    // Closing hand into a fist must immediately release the pen to transition into fist wipe
+    if (pen.down) pen.down = false;
+  } else if (!pen.down) {
+    // index must be extended to start: a thumb resting on a curled finger in a fist is not a pinch
+    if (pinching && hand.indexExt) {
+      pen.down = true;
+      pen.raw = { x: tx, y: ty }; pen.brush = { x: tx, y: ty };
+      pen.last = { x: tx, y: ty }; pen.mid0 = { x: tx, y: ty };
+      pen.relCount = 0; pen.relSince = 0;
+      penDot(tx, ty);
+    }
+  } else {
+    if (pinching) {
+      pen.relCount = 0; pen.relSince = 0;
+      pen.raw.x += (tx - pen.raw.x) * CFG.ease1;         // smooth pass one
+      pen.raw.y += (ty - pen.raw.y) * CFG.ease1;
+    } else {
+      // a hand that vanishes for one frame must not lift the pen
+      pen.relCount++;
+      if (!pen.relSince) pen.relSince = now;
+      if (pen.relCount >= CFG.releaseFrames && now - pen.relSince >= CFG.releaseMs) {
+        penCurve(pen.mid0.x, pen.mid0.y, pen.last.x, pen.last.y, pen.last.x, pen.last.y);
+        pen.down = false;
+      }
+    }
+    if (pen.down) {
+      pen.brush.x += (pen.raw.x - pen.brush.x) * CFG.ease2; // smooth pass two
+      pen.brush.y += (pen.raw.y - pen.brush.y) * CFG.ease2;
+      const moved = Math.hypot(pen.brush.x - pen.last.x, pen.brush.y - pen.last.y);
+      if (moved > CFG.tremor * W) {
+        const m1 = { x: (pen.last.x + pen.brush.x) / 2, y: (pen.last.y + pen.brush.y) / 2 };
+        penCurve(pen.mid0.x, pen.mid0.y, pen.last.x, pen.last.y, m1.x, m1.y);  // through midpoints, no corners
+        pen.mid0 = m1; pen.last = { x: pen.brush.x, y: pen.brush.y };
+      }
+    }
+  }
+
+  /* ── star on the pinch point ── */
+  const showStar = fresh && !fist && (pinching || pen.down);
+  if (showStar) {
+    if (!star.on) { star.x = tx; star.y = ty; }
+    star.x += (tx - star.x) * CFG.starEase;
+    star.y += (ty - star.y) * CFG.starEase;
+  }
+  star.on = showStar;
+
+  /* ── fist wipe ── */
+  wipe.active = false;
+  if (fist && !pen.down) {
+    const pts = hand.pts, ids = [0, 5, 9, 13, 17];
+    const px = ids.reduce((s, i) => s + pts[i].x, 0) / ids.length;
+    const py = ids.reduce((s, i) => s + pts[i].y, 0) / ids.length;
+    if (!wipe.raw) wipe.raw = { x: px, y: py };
+    wipe.raw.x += (px - wipe.raw.x) * CFG.ease1;
+    wipe.raw.y += (py - wipe.raw.y) * CFG.ease1;
+    const baseR = Math.min(W, H) * (CFG.fistWipeRadius || 0.20);
+    wipe.r = hand.width ? clamp(hand.width * 1.45, baseR * 0.75, baseR * 1.35) : baseR;
+    wipe.active = true;
+
+    const p = wipe.raw;
+    if (!wipe.last) {
+      fistStamp(p.x, p.y, wipe.r);
+      wipe.last = { x: p.x, y: p.y };
+    } else {
+      const dx = p.x - wipe.last.x, dy = p.y - wipe.last.y, dist = Math.hypot(dx, dy);
+      if (dist > CFG.jump * W) {                         // tracking glitch: stamp once, no long streak
+        fistStamp(p.x, p.y, wipe.r);
+        wipe.last = { x: p.x, y: p.y };
+      } else {
+        const step = Math.max(6, wipe.r / 3);            // smooth continuous stamping
+        const n = Math.min(CFG.maxStamps, Math.floor(dist / step));
+        for (let i = 1; i <= n; i++) {
+          const f = (i * step) / dist;
+          fistStamp(wipe.last.x + dx * f, wipe.last.y + dy * f, wipe.r);
+        }
+        if (n > 0) {
+          const f = (n * step) / dist;
+          wipe.last = { x: wipe.last.x + dx * f, y: wipe.last.y + dy * f };
+        }
+      }
+    }
+  } else {
+    wipe.raw = null;
+    wipe.last = null;
+  }
+}
+
+/* ════════ Drawing a frame ════════ */
+function composite() {
+  // 1. camera, mirrored
+  vctx.globalCompositeOperation = 'source-over';
+  drawVideoMirrored(vctx, W, H, 1);
+
+  // 2+3. frost = blurred, brightened, tinted camera, masked by the fog canvas
+  const sw = smallC.width, sh = smallC.height;
+  sm.clearRect(0, 0, sw, sh);
+  sm.save();
+  if (hasFilter) sm.filter = `blur(${CFG.blur * dpr * bs}px) brightness(${CFG.bright})`;
+  drawVideoMirrored(sm, sw, sh, 1.1);                    // drawn a little oversize so blurred edges stay opaque
+  sm.restore();
+  if (!hasFilter) { sm.fillStyle = 'rgba(255,255,255,.1)'; sm.fillRect(0, 0, sw, sh); }
+  sm.fillStyle = `rgba(${CFG.tint},${CFG.white})`;       // blur alone doesn't read as fog; it needs a little white
+  sm.fillRect(0, 0, sw, sh);
+
+  fr.globalCompositeOperation = 'source-over';
+  fr.clearRect(0, 0, W, H);
+  fr.imageSmoothingEnabled = true; fr.imageSmoothingQuality = 'high';
+  fr.drawImage(smallC, 0, 0, W, H);
+  fr.globalCompositeOperation = 'destination-in';
+  fr.drawImage(fogC, 0, 0);
+  fr.globalCompositeOperation = 'source-over';
+  vctx.drawImage(frostC, 0, 0);
+
+  // 4. condensation droplets on the glass (masked by fog)
+  vctx.drawImage(dropC, 0, 0);
+
+  // snapshot now, before UI sparkles are drawn on top
+  if (saveReq) {
+    saveReq = false;
+    view.toBlob(b => {
+      if (!b) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = 'dewglass-' + new Date().toISOString().replace(/[:.]/g, '-') + '.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }, 'image/png');
+    const f = $('flash'); f.classList.add('on'); requestAnimationFrame(() => requestAnimationFrame(() => f.classList.remove('on')));
+  }
+
+  if (wipe.active) {                                     // faint ring showing the wipe size
+    vctx.strokeStyle = 'rgba(255,255,255,.35)'; vctx.lineWidth = 1.5 * dpr;
+    vctx.beginPath(); vctx.arc(wipe.raw.x, wipe.raw.y, wipe.r, 0, TAU); vctx.stroke();
+  }
+  if (star.on) drawStar(star.x, star.y);
+}
+
+function drawStar(x, y) {
+  const r = 8 * dpr;
+  vctx.save();
+  vctx.translate(x, y);
+  const g = vctx.createRadialGradient(0, 0, 0, 0, 0, r * 3);
+  g.addColorStop(0, 'rgba(255,240,200,.85)'); g.addColorStop(1, 'rgba(255,240,200,0)');
+  vctx.fillStyle = g; vctx.beginPath(); vctx.arc(0, 0, r * 3, 0, TAU); vctx.fill();
+  vctx.shadowColor = 'rgba(255,225,160,1)'; vctx.shadowBlur = 12 * dpr;
+  vctx.fillStyle = '#fff';
+  vctx.beginPath();
+  for (let i = 0; i < 8; i++) {
+    const rad = i % 2 ? r * 0.3 : r, a = i * Math.PI / 4 - Math.PI / 2;
+    vctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+  }
+  vctx.closePath(); vctx.fill();
+  vctx.restore();
+}
+
+function frame(now) {
+  if (!running) return;
+  rafId = requestAnimationFrame(frame);
+  frameN++;
+  const dt = Math.min(0.1, Math.max(0.001, (now - lastT) / 1000));
+  fps += ((1000 / Math.max(1, now - lastT)) - fps) * 0.1;
+  lastT = now;
+
+  kick();
+  updateBlowingGesture(now);
+
+  // fog centre trails the mouth instead of snapping to it
+  fogCenter.x += (mouth.x - fogCenter.x) * CFG.faceEase;
+  fogCenter.y += (mouth.y - fogCenter.y) * CFG.faceEase;
+
+  updateHand(now);
+
+  // fog up from genuine breath gesture or Space, but never while someone is drawing or wiping
+  const strength = spaceDown ? 1 : faceGesture.strength;
+  if (strength > 0 && !pen.down && !wipe.active && frameN % CFG.blobEvery === 0) {
+    breathBlobs(strength);
+  }
+
+  // Ambient fog accumulation across the mirror canvas
+  if (ambientFog.enabled && frameN % ambientFog.every === 0) {
+    applyAmbientFog(dt);
+  }
+
+  // Natural subtle evaporation and realistic droplets
+  evaporateFog(dt);
+  updateDroplets(dt);
+
+  composite();
+  if (showHud && frameN % 3 === 0) drawHud();
+}
+
+function drawHud() {
+  const fresh = faceGesture.pts && (performance.now() - faceGesture.t < 500);
+  hudEl.textContent =
+    `[ FACE & BREATH HUD -- Press 'D' to toggle ]\n` +
+    `fps           ${fps.toFixed(0)}\n` +
+    `face tracking ${fresh ? 'LOCKED ON' : 'LOOKING FOR FACE...'}\n` +
+    `baselineWidth ${(faceGesture.baselineWidth || 0).toFixed(3)}\n` +
+    `normWidth     ${faceGesture.normW.toFixed(3)}\n` +
+    `pursedRatio   ${faceGesture.pursedRatio.toFixed(3)}  (triggers <= ${CFG.gesturePursedRatio.toFixed(2)})\n` +
+    `aspectOuter   ${faceGesture.aspectOuter.toFixed(3)}  (pucker >= ${CFG.gestureAspectOuterMin.toFixed(2)})\n` +
+    `aspectInner   ${faceGesture.aspectInner.toFixed(3)}\n` +
+    `pursed shape  ${faceGesture.isCandidate ? 'YES' : 'no'}\n` +
+    `confirmFrames ${faceGesture.confirmFrames}/${CFG.gestureConfirmFrames}\n` +
+    `isBlowing     ${faceGesture.isBlowing ? '>>> BLOWING <<<' : 'idle'}\n` +
+    `fog strength  ${faceGesture.strength.toFixed(2)}${spaceDown ? ' (SPACEBAR)' : ''}\n` +
+    `ambient fog   ${(ambientFog.enabled || ambientFog.active) ? 'ACTIVE (hold)' : 'idle'}\n` +
+    `\n` +
+    `[ HAND GESTURES ]\n` +
+    `pinch         ${hand.ratio.toFixed(2)} ${hand.pinch ? 'PINCHING' : 'up'}  pen: ${pen.down ? 'DOWN' : 'up'}\n` +
+    `fist          ${hand.fist ? 'FIST' : 'open'}  wipe: ${wipe.active ? 'ACTIVE' : 'off'}`;
+}
+
+/* ════════ Start / stop ════════ */
+const gum = c => navigator.mediaDevices.getUserMedia(c);
+
+async function begin() {
+  if (running) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    throw Object.assign(new Error('insecure'), { name: 'InsecureContext' });
+  }
+  if (!window.Hands || !window.FaceMesh) {
+    throw new Error('The tracking library could not be downloaded. Check your internet connection and reload.');
+  }
+
+  const vid = { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' };
+  stream = await gum({ video: vid });
+
+  // Handle stream interruption (e.g. camera unplugged or system permission revoked)
+  stream.getVideoTracks().forEach(track => {
+    track.onended = () => {
+      if (running) {
+        stop();
+        errEl.textContent = 'Camera disconnected or access was revoked.';
+      }
+    };
+  });
+
+  video.srcObject = stream;
+  await video.play();
+  if (!video.videoWidth) await new Promise(r => video.addEventListener('loadedmetadata', r, { once: true }));
+
+  if (!hands) {
+    hands = new Hands({ locateFile: f => HANDS_URL + f });
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
+    hands.onResults(onHands);
+    faces = new FaceMesh({ locateFile: f => FACEMESH_URL + f });
+    faces.setOptions({ maxNumFaces: 1, refineLandmarks: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+    faces.onResults(onFace);
+    await hands.initialize();
+    await faces.initialize();
+  }
+
+  startEl.style.display = 'none';
+  stageEl.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  resize();
+  faceGesture.baselineWidth = null; // Snaps to user's real resting width on first tracked frame
+  faceGesture.confirmFrames = 0; faceGesture.releaseFrames = 0; faceGesture.strength = 0; faceGesture.isBlowing = false;
+  hudEl.style.display = showHud ? 'block' : 'none';
+  pen.down = false; wipe.raw = wipe.last = null; star.on = false;
+  hand.pts = null;
+  if (hintTimer) { clearTimeout(hintTimer); hintTimer = null; }
+  hintEl.classList.remove('gone');
+  hintEl.innerHTML = '<span class="hint-dot"></span><span>pinch to draw &middot; fist to wipe &middot; blow or hold space to fog</span>';
+  hintTimer = setTimeout(() => {
+    if (running) hintEl.classList.add('gone');
+  }, 7000);
+
+  running = true;
+  busy = false;
+  lastT = performance.now();
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(frame);
+}
+
+const ENTER_BTN_HTML = '<span>Enter the Mirror</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+
+function stop() {
+  running = false;
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = 0;
+  }
+  if (stream) {
+    stream.getTracks().forEach(t => {
+      t.onended = null;
+      t.stop();
+    });
+    stream = null;
+  }
+  video.srcObject = null;
+  spaceDown = false;
+  pointerHeld = false;
+  aKeyDown = false;
+  setAmbientHolding(false);
+  if (hintTimer) {
+    clearTimeout(hintTimer);
+    hintTimer = null;
+  }
+  hintEl.classList.add('gone');
+  busy = false;
+  evapAccum = 0;
+  faceGesture.baselineWidth = null;
+  faceGesture.confirmFrames = 0; faceGesture.releaseFrames = 0; faceGesture.strength = 0; faceGesture.isBlowing = false;
+  hand.pts = null; faceGesture.pts = null;
+  stageEl.style.display = 'none';
+  startEl.style.display = '';
+  if (innerWidth <= 860) document.body.style.overflow = 'auto';
+  goBtn.disabled = false;
+  goBtn.innerHTML = ENTER_BTN_HTML;
+}
+
+goBtn.addEventListener('click', async () => {
+  errEl.textContent = ''; noteEl.textContent = '';
+  goBtn.disabled = true; goBtn.innerHTML = '<span>Preparing the Mirror…</span>';
+  try { await begin(); }
+  catch (e) {
+    if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    goBtn.disabled = false; goBtn.innerHTML = ENTER_BTN_HTML;
+    const n = e && e.name;
+    if (n === 'InsecureContext') {
+      errEl.textContent = location.protocol === 'file:'
+        ? 'Browsers block the camera on files opened by double-click (file://). Serve this folder instead — see the README (python3 -m http.server) — and open http://localhost:8000.'
+        : 'The camera only works on https or localhost. Open this page from one of those.';
+    } else if (n === 'NotAllowedError' || n === 'SecurityError') {
+      errEl.textContent = 'Camera access was refused. Allow the camera for this page in your browser’s address bar, then press the button again.';
+    } else if (n === 'NotFoundError' || n === 'OverconstrainedError') {
+      errEl.textContent = 'No camera was found. Plug one in or check that another app isn’t using it.';
+    } else if (n === 'NotReadableError') {
+      errEl.textContent = 'The camera is busy — another app or tab is using it. Close it and try again.';
+    } else {
+      errEl.textContent = 'Something went wrong: ' + (e && e.message ? e.message : e);
+    }
+    console.warn(e);
+  }
+});
+
+/* ════════ Controls ════════ */
+addEventListener('keydown', e => {
+  lastKey = performance.now();                           // breath is ignored for 300ms after any key
+  if (!running) return;
+  if (e.code === 'Space') { e.preventDefault(); spaceDown = true; return; }
+  if (e.repeat) return;
+  const k = e.key.toLowerCase();
+  if (k === 's') saveReq = true;
+  else if (k === 'c') resetFog();
+  else if (k === 'd') { showHud = !showHud; hudEl.style.display = showHud ? 'block' : 'none'; }
+  else if (k === 'a') {
+    if (!aKeyDown) {
+      aKeyDown = true;
+      setAmbientHolding(true);
+    }
+  }
+  else if (e.key === 'Escape') stop();
+});
+
+addEventListener('keyup', e => {
+  if (e.code === 'Space') { e.preventDefault(); spaceDown = false; }
+  if (e.key && e.key.toLowerCase() === 'a') {
+    aKeyDown = false;
+    if (!pointerHeld) setAmbientHolding(false);
+  }
+});
+
+addEventListener('blur', () => {
+  spaceDown = false;
+  aKeyDown = false;
+  pointerHeld = false;
+  setAmbientHolding(false);
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    spaceDown = false;
+    aKeyDown = false;
+    pointerHeld = false;
+    setAmbientHolding(false);
+  } else {
+    lastT = performance.now();
+  }
+});
+
+$('shutter').addEventListener('click', e => { saveReq = true; e.currentTarget.blur(); });
+
+const btnAmbient = $('btnAmbient');
+if (btnAmbient) {
+  // Prevent click from toggling or retaining persistent active state
+  btnAmbient.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  // Pointer press starts accumulation and acquires capture
+  btnAmbient.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    pointerHeld = true;
+    setAmbientHolding(true);
+    try {
+      btnAmbient.setPointerCapture(e.pointerId);
+    } catch (_) {}
+  });
+
+  const stopPointerHold = e => {
+    pointerHeld = false;
+    if (e && typeof e.pointerId === 'number') {
+      try {
+        if (btnAmbient.hasPointerCapture(e.pointerId)) {
+          btnAmbient.releasePointerCapture(e.pointerId);
+        }
+      } catch (_) {}
+    }
+    if (!aKeyDown) setAmbientHolding(false);
+  };
+
+  btnAmbient.addEventListener('pointerup', stopPointerHold);
+  btnAmbient.addEventListener('pointercancel', stopPointerHold);
+  btnAmbient.addEventListener('lostpointercapture', stopPointerHold);
+  btnAmbient.addEventListener('pointerleave', () => {
+    try {
+      if (!btnAmbient.hasPointerCapture || !btnAmbient.hasPointerCapture(1)) {
+        pointerHeld = false;
+        if (!aKeyDown) setAmbientHolding(false);
+      }
+    } catch (_) {
+      pointerHeld = false;
+      if (!aKeyDown) setAmbientHolding(false);
+    }
+  });
+}
+
+// Global safety fallbacks for pointer release / cancel
+window.addEventListener('pointerup', () => {
+  if (pointerHeld) {
+    pointerHeld = false;
+    if (!aKeyDown) setAmbientHolding(false);
+  }
+});
+window.addEventListener('pointercancel', () => {
+  if (pointerHeld) {
+    pointerHeld = false;
+    if (!aKeyDown) setAmbientHolding(false);
+  }
+});
+
+const btnClear = $('btnClear');
+if (btnClear) btnClear.addEventListener('click', e => { resetFog(); e.currentTarget.blur(); });
+const btnHud = $('btnHud');
+if (btnHud) btnHud.addEventListener('click', e => {
+  showHud = !showHud;
+  hudEl.style.display = showHud ? 'block' : 'none';
+  e.currentTarget.blur();
+});
+const btnExit = $('btnExit');
+if (btnExit) btnExit.addEventListener('click', e => { stop(); e.currentTarget.blur(); });
+
+addEventListener('resize', () => { if (running) resize(); });
+
+/* Surface every error on screen (and in the console) instead of failing silently. */
+function showFatal(msg) { fatalEl.style.display = 'block'; fatalEl.textContent = msg; }
+addEventListener('error', e => showFatal('Error: ' + e.message));
+addEventListener('unhandledrejection', e => showFatal('Error: ' + (e.reason && e.reason.message || e.reason)));
+
+if (location.protocol === 'file:') {
+  noteEl.textContent = 'Heads up: this file was opened directly. The camera needs localhost or https — see the README.';
+}
+
+</script>
+</body>
+</html>

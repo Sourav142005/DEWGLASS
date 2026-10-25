@@ -1,0 +1,45 @@
+# Backups and historical snapshots
+*.bak
+*.bak.*
+*.old
+*.orig
+*~
+
+# Authentic personal signature assets (excluded from public release)
+signature.jpg
+/signature.jpg
+assets/signature.png
+assets/signature.jpg
+assets/*.bak
+
+# Development & review screenshots (prevents repository bloat)
+cand_*.png
+final_*.png
+dock_*.png
+polish_*.png
+ambient_fog_active.png
+landing_signature_verified.png
+
+# Development, test, and scratch folders
+scratch/
+tmp/
+temp/
+*.tmp
+*.temp
+
+# OS metadata
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE and local editor configuration
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
